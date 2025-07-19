@@ -10,6 +10,7 @@
     "build:linux": "electron-builder --linux AppImage"
   },
   "build": {
+    "publish": null,
     "appId": "com.ramey.coursera",
     "productName": "Coursera",
     "files": [
