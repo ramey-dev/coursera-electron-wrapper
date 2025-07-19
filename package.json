@@ -1,16 +1,35 @@
 {
-  "name": "coursera-electron-wrapper",
-  "version": "1.0.0",
+  "name": "coursera",
+  "version": "1.1.2",
+  "description": "Electron wrapper for Coursera",
+  "author": "Matt Ramey <r@mey.dev>",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux AppImage"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "build": {
+    "appId": "com.ramey.coursera",
+    "productName": "Coursera",
+    "files": [
+      "**/*",
+      "!node_modules/*/{test,__tests__}/**",
+      "!.git/**",
+      "!release/**",
+      "!dist/**"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Education"
+    }
+  },
   "devDependencies": {
-    "electron": "^37.2.3",
-    "electron-builder": "^26.0.12"
+    "electron": "^28.1.0",
+    "electron-builder": "^24.12.0"
   }
 }
+

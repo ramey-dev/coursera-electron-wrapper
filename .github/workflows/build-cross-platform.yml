@@ -1,10 +1,10 @@
-name: Build Electron App (Cross-Platform)
+name: Build & Release Electron App (Cross-Platform)
 
 on:
-  workflow_dispatch:  # Manual trigger
   push:
     tags:
-      - "v*"  # Runs on version tags like v1.0.0
+      - "v*"  # Trigger only on version tags
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,12 +12,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        platform: [win32, linux]
+        platform: [win, linux]
         include:
-          - platform: win32
+          - platform: win
             os: windows-latest
+            build-command: npm run build:win
+            artifact-path: dist/*.exe
           - platform: linux
             os: ubuntu-latest
+            build-command: npm run build:linux
+            artifact-path: dist/*.AppImage
 
     steps:
       - name: Checkout code
@@ -28,19 +32,25 @@ jobs:
         with:
           node-version: 20
 
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
       - name: Install dependencies
         run: npm install
 
-      - name: Package Electron App
-        run: |
-          npx electron-packager . Coursera \
-            --platform=${{ matrix.platform }} \
-            --arch=x64 \
-            --out=release \
-            --overwrite
+      - name: Verify electron-builder
+        run: npx electron-builder --version
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+      - name: Build for ${{ matrix.platform }}
+        run: ${{ matrix.build-command }}
+
+      - name: Upload to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: Coursera-${{ matrix.platform }}
-          path: release/**
+          files: ${{ matrix.artifact-path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
