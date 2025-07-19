@@ -20,11 +20,13 @@
       "!dist/**"
     ],
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "icon.ico"
     },
     "linux": {
       "target": ["AppImage"],
-      "category": "Education"
+      "category": "Education",
+      "icon": "ico.png"
     }
   },
   "devDependencies": {
